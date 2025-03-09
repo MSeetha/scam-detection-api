@@ -1,0 +1,36 @@
+import os
+import pandas as pd
+
+# Define the root folder where the data is stored
+root_folder = r"C:\Users\Asus\AppData\Local\Instaloader\Data"
+
+# List to store extracted data
+data_list = []
+
+# Loop through each folder inside the root directory
+for folder_name in os.listdir(root_folder):
+    folder_path = os.path.join(root_folder, folder_name)
+
+    # Check if it's a directory
+    if os.path.isdir(folder_path):
+        txt_files = [f for f in os.listdir(folder_path) if f.endswith("_UTC.txt")]
+
+        for txt_file in txt_files:
+            txt_path = os.path.join(folder_path, txt_file)
+
+            # Read the content of the TXT file
+            with open(txt_path, "r", encoding="utf-8") as file:
+                lines = file.readlines()
+                caption = lines[0].strip() if lines else "No Caption"
+
+                # Store data
+                data_list.append({"Folder": folder_name, "Caption": caption, "File Path": txt_path})
+
+# Convert extracted data into a DataFrame
+df = pd.DataFrame(data_list)
+
+# Save to CSV file
+csv_path = os.path.join(root_folder, "instagram_data.csv")
+df.to_csv(csv_path, index=False, encoding="utf-8")
+
+print(f"✅ Data saved successfully to {csv_path}")

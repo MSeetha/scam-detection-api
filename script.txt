@@ -1,0 +1,43 @@
+import os
+import json
+import pandas as pd
+
+# Define the root folder where your scraped data is stored
+root_folder = "C:\Users\Asus\AppData\Local\Instaloader\Data" # Replace with the actual path to your folder
+
+# List to hold all the data
+data = []
+
+# Loop through all folders and files
+for folder_name in os.listdir(root_folder):
+    folder_path = os.path.join(root_folder, folder_name)
+    
+    if os.path.isdir(folder_path):  # Ensure we're working with folders
+        for file_name in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, file_name)
+            
+            # Read data from each file (assuming the data is in JSON format)
+            if file_name.endswith(".json"):  # Change this based on your file format
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    try:
+                        # Load the JSON data
+                        post_data = json.load(file)
+                        
+                        # Assuming your data has fields like 'Hashtag', 'Post URL', 'Caption', 'Comments'
+                        data.append({
+                            "Hashtag": post_data.get("hashtag", "No hashtag"),
+                            "Post URL": post_data.get("url", "No URL"),
+                            "Caption": post_data.get("caption", "No caption"),
+                            "Comments": post_data.get("comments", "No comments")
+                        })
+                    except Exception as e:
+                        print(f"Error reading {file_path}: {e}")
+
+# Convert the data to a pandas DataFrame
+df = pd.DataFrame(data)
+
+# Save the DataFrame to a CSV file
+csv_file = "scraped_instagram_data.csv"  # Define your CSV output file
+df.to_csv(csv_file, index=False, encoding="utf-8")
+
+print(f"✅ Data saved successfully to {csv_file}")
